@@ -17,11 +17,10 @@ typedef vector<ll> vl;
 
 template<class K, class V, int L=20>
 struct amogus_map {
-    #define P (1<<L)
-    int mod_mask = (P-1);
-    K table[P];
-    bitset<P> used;
-    V value[P];
+    int mod_mask = ((1<<L)-1);
+    K table[1<<L];
+    bitset<1<<L> used;
+    V value[1<<L];
     int __size=0;
 
     // got this hash from KACTL
@@ -168,7 +167,7 @@ ostream& operator<<(ostream& o, tuple<T...> t) {
 
 void _print() {cerr << "]\n";} template <class T, class... V>
 void _print(T t, V... v) {cerr<<t; if (sizeof...(v)) cerr << ", "; _print(v...);}
-#define D(x...) do {cerr << "[" << #x << "] = ["; _print(x); } while(0);
+#define DE(x...) do {cerr << "[" << #x << "] = ["; _print(x); } while(0);
 #define DF(i, s, e, x...) do { for (ll i=(s); i<(e); ++i) {cerr<<i<<": "; D(x)} } while(0);
 
 #define TIE(a, b, _p) auto __p = _p; auto a = __p.first; auto b = __p.second;
