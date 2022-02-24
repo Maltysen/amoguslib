@@ -1,0 +1,2 @@
+cpp -I$(dirname $(realpath $0)) $1.cpp -DCOPIER | sed "s/TEMP_INCLUDE_BITS/\#include <bits\/stdc++.h>/" | xclip -selection clipboard
+
