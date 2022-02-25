@@ -1,5 +1,8 @@
 #pragma once
 
+#undef D
+#define DE(x...) __DEBUG_PRINT(x)
+
 //Geometry
 typedef complex<ld> pt;
 struct line {

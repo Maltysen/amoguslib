@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef COPIER
-    #include <bits/stdc++.h>
+    #include "bits/stdc++.h"
 #else
     TEMP_INCLUDE_BITS
 #endif
@@ -131,6 +131,14 @@ ll CRT(const vector<ll> &a, const vector<ll> &n) {
 template <class T>
 using min_heap = priority_queue<T, vector<T>, greater<T>>;
 
+template <class T>
+using ordered_set<T> = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+template <class K, V>
+using ordered_map<K, V> = tree<T, V, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+/////////////////// MACROS AND I/O ///////////////////////
+
 #define K first
 #define V second
 
@@ -141,7 +149,7 @@ ostream& operator<<(ostream& o, pair<T, S> p) {
 }
 
 template<template<class, class...> class T, class... A>
-typename enable_if<!is_same<T<A...>, string>(), ostream&>::type
+typename enable_if<!(is_same<T<A...>, string>() || is_same<T<A...>, complex<ld>>()), ostream&>::type
 operator<< (ostream& o, T<A...> v) {
 	o<<'[';
 	for (auto a:v) o<<a <<", ";
@@ -163,12 +171,16 @@ ostream& operator<<(ostream& o, tuple<T...> t) {
     return o<<')';
 }
 
-/////////////// FUN MACROS ///////////////
-
-void _print() {cerr << "]\n";} template <class T, class... V>
+void _print() {cerr << "]"<<endl;} template <class T, class... V>
 void _print(T t, V... v) {cerr<<t; if (sizeof...(v)) cerr << ", "; _print(v...);}
-#define DE(x...) do {cerr << "[" << #x << "] = ["; _print(x); } while(0);
-#define DF(i, s, e, x...) do { for (ll i=(s); i<(e); ++i) {cerr<<i<<": "; D(x)} } while(0);
+
+#ifdef ONLINE_JUDGE
+    #define __DEBUG_PRINT(x...) do {} while(0);
+#else
+    #define __DEBUG_PRINT(x...) do {cerr << "[" << #x << "] = ["; _print(x); } while(0);
+#endif
+
+#define D(x...) __DEBUG_PRINT(x)
 
 #define TIE(a, b, _p) auto __p = _p; auto a = __p.first; auto b = __p.second;
 
