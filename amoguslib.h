@@ -126,16 +126,21 @@ ll CRT(const vector<ll> &a, const vector<ll> &n) {
   return sm % prod;
 }
 
+// TODO miller rabin
+
 //////////////// TYPEDEFS ///////////////
 
 template <class T>
 using min_heap = priority_queue<T, vector<T>, greater<T>>;
 
+// TODO: figure out how to include pbds
+/*
 template <class T>
-using ordered_set<T> = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 template <class K, V>
-using ordered_map<K, V> = tree<T, V, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+using ordered_map = tree<K, V, less<K>, rb_tree_tag, tree_order_statistics_node_update>;
+*/
 
 /////////////////// MACROS AND I/O ///////////////////////
 
@@ -149,7 +154,7 @@ ostream& operator<<(ostream& o, pair<T, S> p) {
 }
 
 template<template<class, class...> class T, class... A>
-typename enable_if<!(is_same<T<A...>, string>() || is_same<T<A...>, complex<ld>>()), ostream&>::type
+typename enable_if<!(is_same<T<A...>, string>() || is_same<T<A...>, complex< tuple_element_t<0, tuple<A...>> >>()), ostream&>::type
 operator<< (ostream& o, T<A...> v) {
 	o<<'[';
 	for (auto a:v) o<<a <<", ";

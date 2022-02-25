@@ -3,6 +3,8 @@
 #undef D
 #define DE(x...) __DEBUG_PRINT(x)
 
+#define __LOADED_2D_GEOMETRY
+
 //Geometry
 typedef complex<ld> pt;
 struct line {
@@ -27,13 +29,14 @@ struct circ { pt C; ld R; };
 #define Y imag()
 #define CRS(a, b) (conj(a) * (b)).Y //scalar cross product
 #define DOT(a, b) (conj(a) * (b)).X //dot product
-#define U(p) ((p) / abs(p)) //unit vector in direction of p (don't use if Z(p) == true)
-#define Z(x) (abs(x) < EPS)
 #define A(a) begin(a), end(a) //shortens sort(), upper_bound(), etc. for vectors
 
 //constants (INF and EPS may need to be modified)
 ld PI = acos(-1), INF = 1e20, EPS = 1e-12;
 pt I = {0, 1};
+
+pt U(const pt&a) {return a/abs(a);} //unit vector in direction of p (don't use if Z(p) == true)
+bool Z(const pt&x) {return abs(x)<EPS;}
 
 namespace std {
 	//lexicographical comparison
@@ -270,6 +273,23 @@ vector<line> circTangents(circ c1, circ c2) {
 	}
 	if(Z(h2)) ans.pop_back();
 	return ans;
+}
+
+// I/O
+ostream& operator<<(ostream& o, line l) {
+    if (l.S) o<<"seg";
+    else o<<"line";
+    return o<<"{P="<<l.P<<", D="<<l.D<<"}";
+}
+
+ostream& operator<<(ostream& o, circ c) {
+    return o<<"circ{C="<<c.C<<", R="<<c.R<<"}";
+}
+
+istream& operator>>(istream &o, pt &p) {
+    ld x, y; o>>x>>y;
+    p={x,y};
+    return o;
 }
 
 #undef A
