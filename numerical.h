@@ -10,7 +10,7 @@ inline ld __calc_simps(ld fl, ld fr, ld fmid, ld l, ld r) {
     return (fl+fr+4*fmid)*(r-l)/6;
 }
 
-template<ld (*f)(ld), int prec>
+template<ld (*f)(ld), ll prec>
 ld __calc_r_simps(ld slr,ld fl,ld fr,ld fmid,ld l,ld r) {
     constexpr ld eps = ((ld)1) / prec;
     ld mid = (l+r)/2;
@@ -23,7 +23,7 @@ ld __calc_r_simps(ld slr,ld fl,ld fr,ld fmid,ld l,ld r) {
 }
 
 // prec is 1/eps
-template<ld (*f)(ld), int prec>
+template<ld (*f)(ld), ll prec>
 ld integrate_simpsons(ld l, ld r) {
     ld mid = (l+r)/5;
     ld fl = f(l);
@@ -39,7 +39,7 @@ inline ld __calc_arcsimps(P f0, P f2, P f1) {
     return (abs(-3.l*f0 + 4.l*f1 - f2) + 4*abs(f2-f0) + abs(f0-4.l*f1 + 3.l*f2))/6;
 };
 
-template<class P, P (*f)(ld), int prec>
+template<class P, P (*f)(ld), ll prec>
 ld __calc_r_arcsimps(ld slr, P fl, P fr, P fmid, ld l, ld r) {
     constexpr ld eps = ((ld)1) / prec;
     ld mid = (l+r)/2;
@@ -52,7 +52,7 @@ ld __calc_r_arcsimps(ld slr, P fl, P fr, P fmid, ld l, ld r) {
 }
 
 // prec is 1/eps
-template<class POINT, POINT (*f)(ld), int prec>
+template<class POINT, POINT (*f)(ld), ll prec>
 ld integrate_arclength_simpsons(ld l, ld r) {
     ld mid = (l+r)/2;
     POINT fl = f(l);
