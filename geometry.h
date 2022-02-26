@@ -3,8 +3,6 @@
 #undef D
 #define DE(x...) __DEBUG_PRINT(x)
 
-#define __LOADED_2D_GEOMETRY
-
 //Geometry
 typedef complex<ld> pt;
 struct line {
@@ -31,9 +29,8 @@ struct circ { pt C; ld R; };
 #define DOT(a, b) (conj(a) * (b)).X //dot product
 #define A(a) begin(a), end(a) //shortens sort(), upper_bound(), etc. for vectors
 
-//constants (INF and EPS may need to be modified)
-ld PI = acos(-1), INF = 1e20, EPS = 1e-12;
-pt I = {0, 1};
+#include <constants.h>
+const pt I = {0, 1};
 
 pt U(const pt&a) {return a/abs(a);} //unit vector in direction of p (don't use if Z(p) == true)
 bool Z(const pt&x) {return abs(x)<EPS;}
@@ -245,18 +242,20 @@ pt centroid(vector<pt>& poly) {
 vector<pt> intsctCC(circ c1, circ c2) {
     pt d = c2.C - c1.C;
     ld d2 = norm(d);
-    if(Z(d2)) return {}; //concentric
+    if(Z(d)) return {}; //concentric
     ld pd = (d2 + c1.R * c1.R - c2.R * c2.R) / 2;
     ld h2 = c1.R * c1.R - pd * pd / d2;
     if(h2 < 0) return {};
-    pt p = c1.C + d * pd / d2, h = d * I * sqrtl(h2 / d2);
+    pt p = c1.C + d * pd / d2, h = d * I * sqrt(h2 / d2);
     if(Z(h)) return {p};
     return {p - h, p + h};
 }
 
 //vector of intersection pts of a line and a circ (up to 2)
 vector<pt> intsctCL(circ c, line l) {
-    vector<pt> v = intsctCC(c, circ{refl_pt(c.C, l), c.R}), ans;
+    vector<pt> v, ans;
+    if(Z(dist_to(c.C, line(l.P, l.P + l.D, 0)))) v = {c.C + c.R * U(l.D), c.C - c.R * U(l.D)};
+    else v = intsctCC(c, circ{refl_pt(c.C, l), c.R});
 	for(pt p : v) if(on_line(p, l)) ans.push_back(p);
     return ans;
 }

@@ -1,9 +1,6 @@
 #pragma once
 
-#ifndef __LOADED_2D_GEOMETRY
-    //constants (INF and EPS may need to be modified)
-    const ld PI = acos(-1), INF = 1e20, EPS = 1e-12;
-#endif
+#include <constants.h>
 
 struct vec3{
     ld x, y, z;
@@ -24,7 +21,6 @@ vec3& operator*=(vec3& a, const ld& f) {a.x*=f; a.y*=f, a.z*=f; return a;}
 vec3& operator/=(vec3& a, const ld& f) {a.x/=f; a.y/=f, a.z/=f; return a;}
 
 vec3 operator-(const vec3&a) {return {-a.x, -a.y, -a.z};}
-//TODO augmented assignment
 
 // cross product
 vec3 operator^(const vec3 &a, const vec3 &b) {
