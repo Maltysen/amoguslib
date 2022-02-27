@@ -1,1 +1,2 @@
-g++ --std=gnu++14 -I$(dirname $(realpath $0)) -include stdc++.h -g -O3 -Wall -Wshadow -Wno-sign-compare -fsanitize=address -fsanitize=undefined $1.cpp -o $1 2>&1 | more
+g++ --std=gnu++14 -I$(dirname $(realpath $0)) -include stdc++.h -Wall -Wshadow -Wno-sign-compare -fsanitize=address -fsanitize=undefined $1.cpp -o $1 2>&1 | more
+
