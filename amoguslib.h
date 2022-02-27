@@ -15,41 +15,33 @@ typedef vector<ll> vl;
 
 /////////////// DATA STRUCTURES ///////////////////
 
-template<class T, int S, int w> struct soh_arr {};
-template<class T, int S> struct soh_arr<T, S, 1> {T *arr = new T[S];};
-template<class T, int S>struct soh_arr<T, S, 0> {T arr[S];};
-template<class T, int S> struct soh_arr<T, S, 2> {T arr[S]={};};
+template<class K, class V, int L=8, bool alloc=true> struct amogus_map{};
 
-template<class K, class V, int L=20, bool alloc=true>
-struct amogus_map {
-    soh_arr<K,1<<L,alloc> soht = soh_arr<K, 1<<L, alloc>{};
-    K *table = soht.arr;
-    soh_arr<V,1<<L,alloc> sohv = soh_arr<V, 1<<L, alloc>{};
-    V *value = sohv.arr;
-    soh_arr<char,1<<(L-3),2-alloc> sohu = soh_arr<char, 1<<(L-3), 2-alloc>{};
-    char *used_arr = sohu.arr;
+#define used(x) ((used_arr[x/8]>>(x%8))&1)
+#define sused(x) ({used_arr[x/8] |= (1<<(x%8));})
+// got this hash from KACTL
+// https://github.com/kth-competitive-programming/kactl/blob/main/content/data-structures/HashMap.h
+const uint64_t __AMOGUSMAP_HASH_C = uint64_t(4e18 * acos(0)) | 71;
+
+//const int RANDOM = chrono::high_resolution_clock::now().time_since_epoch().count();
+//int h = __builtin_bswap64(__AMOGUSMAP_HASH_C*(hash<K>{}(x) ^ RANDOM)) & ((1<<__res)-1); // if u're worried about hacking
+
+#define find_val(x) int h = __builtin_bswap64(__AMOGUSMAP_HASH_C*hash<K>{}(x)) & ((1<<__res)-1); \
+    while (used(h) && table[h]!=x) h = (h+1) & ((1<<__res)-1);
+#define MAKEIF(O,T) template<class U=V> typename enable_if<O is_empty<U>::value, T>::type
+template<class K, class V, int L>
+struct amogus_map<K,V,L,false> {
+    const int __res = L;
+    K table[1<<L];
+    V value[1<<L];
+    char used_arr[1<<(L-3)];
     int __size=0;
-
-    #define used(x) ((used_arr[x/8]>>(x%8))&1)
-    #define sused(x) ({used_arr[x/8] |= (1<<(x%8));})
-
-    // got this hash from KACTL
-    // https://github.com/kth-competitive-programming/kactl/blob/main/content/data-structures/HashMap.h
-    const uint64_t C = uint64_t(4e18 * acos(0)) | 71;
-    
-    //const int RANDOM = chrono::high_resolution_clock::now().time_since_epoch().count();
-    //int h = __builtin_bswap64(C*(hash<K>{}(x) ^ RANDOM)) & ((1<<L)-1); // if u're worried about hacking
-
-    #define find_val(x) int h = __builtin_bswap64(C*hash<K>{}(x)) & ((1<<L)-1); \
-        while (used(h) && table[h]!=x) h = (h+1) & ((1<<L)-1);
-
-    #define MAKEIF(O,T) template<class U=V> typename enable_if<O is_empty<U>::value, T>::type
 
     MAKEIF(!, V&)
     operator[](const K &x) {
         find_val(x)
         if (!used(h)) {
-            table[h]=x, sused(h), __size++;
+            table[h]=x, sused(h), __size++, value[h]=V{};
         }
         return value[h];
     }
@@ -78,25 +70,90 @@ struct amogus_map {
         }
         return false;
     }
-
-    #undef find_val
-    #undef used
-    #undef sused
-    #undef MAKEIF
-
-    void clear() {memset(used_arr, 0, sizeof used_arr);  __size=0;}
+    void clear() {memset(used_arr, 0, 1<<(L-3));  __size=0;}
     int size() {return __size;}
-
-    template<bool C=alloc>
-    typename enable_if<C, void>::type destruct(){delete[] used_arr; delete[] table; delete[] value;};
-    template<bool C=alloc> typename enable_if<!C, void>::type destruct(){};
-    ~amogus_map() {destruct();}
 };
 
-template<class T, int L=20, bool alloc=true>
+template<class K, class V, int L>
+struct amogus_map<K,V,L,true> {
+    int __res = L;
+    int __size=0;
+    K* table = new K[1<<__res];
+    V* value = new V[1<<__res];
+    char *used_arr = new char[1<<(__res-3)]();
+
+    bool CHKLOADF() {
+        if (__size*3 > (1<<__res)) {
+            __res++;
+            K* ot=table; V* ov=value; char* ou = used_arr;
+            table=new K[1<<__res]; value=new V[1<<__res]; used_arr = new char[1<<(__res-3)]();
+            for (int i=0; i<(1<<(__res-1)); ++i) {
+                if (((ou[i/8]>>(i%8))&1)) {
+                    K k = ot[i];
+                    find_val(k)
+                    table[h]=k, sused(h), value[h]=ov[i];
+                }
+            }
+            delete[]ot; delete[] ou; delete[] ov;
+            return true;
+        }
+        return false;
+    }
+
+    MAKEIF(!, V&)
+    operator[](const K &x) {
+        find_val(x)
+        if (!used(h)) {
+            table[h]=x, sused(h), __size++, value[h]=V{};
+            if (CHKLOADF()) return (*this)[x];
+        }
+        return value[h];
+    }
+
+    bool count(const K&x) const {
+        find_val(x)
+        return used(h);
+    }
+
+    MAKEIF(!, bool)
+    insert(const pair<K, V> &p) {
+        find_val(p.K)
+        if (!used(h)) {
+            table[h]=p.K, sused(h), value[h]=p.V, __size++;
+            CHKLOADF();
+            return true;
+        }
+        return false;
+    }
+
+    MAKEIF(,bool)
+    insert(const K &k) {
+        find_val(k)
+        if (!used(h)) {
+            table[h]=k, sused(h), __size++;
+            CHKLOADF();
+            return true;
+        }
+        return false;
+    }
+
+    void clear() {memset(used_arr, 0, 1<<(__res-3));  __size=0;}
+    int size() {return __size;}
+
+    ~amogus_map(){delete[] used_arr; delete[] table; delete[] value;};
+};
+
+#undef find_val
+#undef used
+#undef sused
+#undef MAKEIF
+
+template<class T, int L=8, bool alloc=true>
 using amogus_set = amogus_map<T, tuple<>, L, alloc>;
 
-template<class T, int __NN, T id, T(* f)(T, T)>
+#define IDT(T, idv...) static constexpr T id() {return idv;}
+
+template<class T, int __NN, T(* f)(T, T)>
 struct segtree {
     T t[2 * __NN];
     ll n=__NN;  // array size
@@ -106,7 +163,7 @@ struct segtree {
     }
 
     T query(ll l, ll r) { // fold f on interval [l, r)
-      T resl=id, resr=id;
+      T resl=T::id(), resr=T::id();
       for (l += n, r += n; l < r; l /= 2, r /= 2) {
         if (l&1) resl = f(resl, t[l++]);
         if (r&1) resr = f(t[--r], resr);
