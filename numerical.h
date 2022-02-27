@@ -60,3 +60,10 @@ ld integrate_arclength_simpsons(ld l, ld r) {
     POINT fmid = f(mid);
     return __calc_r_arcsimps<POINT, f, prec>(__calc_arcsimps<POINT>(fl, fr, fmid), fl, fr, fmid, l, r);
 }
+
+// https://victorlecomte.com/cp-geo.pdf
+pair<ld,ld> quadratic_formula(ld a, ld b, ld c) {
+    ld d = b*b - 4*a*c;
+    ld sum = (b>=0) ? -b-sqrt(d) : -b+sqrt(d);
+    return {sum/(2*a), sum==0 ? 0 : (2*c)/sum};
+}
