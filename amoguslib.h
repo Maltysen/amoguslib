@@ -2,6 +2,7 @@
 
 #ifndef COPIER
     #include "bits/stdc++.h"
+#elif __CYGWIN__ || _WIN32 || _WIN64
 #else
     TEMP_INCLUDE_BITS
 #endif
