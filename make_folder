@@ -1,1 +1,1 @@
-cp $(dirname $(realpath $0))/round/* .
+cp -rT $(dirname $(realpath $0))/round .
