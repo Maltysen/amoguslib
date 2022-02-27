@@ -1,4 +1,4 @@
 mkdir -p out
-cpp -I$(dirname $(realpath $0)) $1.cpp -DCOPIER | sed "s/TEMP_INCLUDE_BITS/\#include <bits\/stdc++.h>/" > out/$1out.cpp
+cpp -I$(dirname $(realpath $0)) $1.cpp -DCOPIER | sed "s/TEMP_INCLUDE_BITS/\#include <bits\/stdc++.h>/" | sed "s/TEMP_INCLUDE_EXT/\#include <bits\/extc++.h>/" > out/$1out.cpp
 cat out/$1out.cpp | xclip -selection clipboard
 
