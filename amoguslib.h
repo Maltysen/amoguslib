@@ -141,15 +141,6 @@ ll CRT(const vector<ll> &a, const vector<ll> &n) {
 template <class T>
 using min_heap = priority_queue<T, vector<T>, greater<T>>;
 
-// TODO: figure out how to include pbds
-/*
-template <class T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
-
-template <class K, V>
-using ordered_map = tree<K, V, less<K>, rb_tree_tag, tree_order_statistics_node_update>;
-*/
-
 /////////////////// MACROS AND I/O ///////////////////////
 
 #define K first
