@@ -15,78 +15,86 @@ typedef vector<ll> vl;
 
 /////////////// DATA STRUCTURES ///////////////////
 
-template<class K, class V, int L=20>
+template<class T, int S, int w> struct soh_arr {};
+template<class T, int S> struct soh_arr<T, S, 1> {T *arr = new T[S];};
+template<class T, int S>struct soh_arr<T, S, 0> {T arr[S];};
+template<class T, int S> struct soh_arr<T, S, 2> {T arr[S]={};};
+
+template<class K, class V, int L=20, bool alloc=true>
 struct amogus_map {
-    int mod_mask = ((1<<L)-1);
-    K table[1<<L];
-    bitset<1<<L> used;
-    V value[1<<L];
+    soh_arr<K,1<<L,alloc> soht = soh_arr<K, 1<<L, alloc>{};
+    K *table = soht.arr;
+    soh_arr<V,1<<L,alloc> sohv = soh_arr<V, 1<<L, alloc>{};
+    V *value = sohv.arr;
+    soh_arr<char,1<<(L-3),2-alloc> sohu = soh_arr<char, 1<<(L-3), 2-alloc>{};
+    char *used_arr = sohu.arr;
     int __size=0;
+
+    #define used(x) ((used_arr[x/8]>>(x%8))&1)
+    #define sused(x) ({used_arr[x/8] |= (1<<(x%8));})
 
     // got this hash from KACTL
     // https://github.com/kth-competitive-programming/kactl/blob/main/content/data-structures/HashMap.h
     const uint64_t C = uint64_t(4e18 * acos(0)) | 71;
     
     //const int RANDOM = chrono::high_resolution_clock::now().time_since_epoch().count();
-    #define __HASH(x) int h = __builtin_bswap64(C*hash<K>{}(x)) & mod_mask;
-    //int h = __builtin_bswap64(C*(hash<K>{}(x) ^ RANDOM)) & mod_mask; // if u're worried about hacking
+    //int h = __builtin_bswap64(C*(hash<K>{}(x) ^ RANDOM)) & ((1<<L)-1); // if u're worried about hacking
 
-    V& operator[](const K &x) {
-        __HASH(x)
-        while (used[h] && table[h]!=x) {
-            h = (h+1)&mod_mask;
-        }
-        if (!used[h]) {
-            table[h]=x, used[h]=1, __size++;
+    #define find_val(x) int h = __builtin_bswap64(C*hash<K>{}(x)) & ((1<<L)-1); \
+        while (used(h) && table[h]!=x) h = (h+1) & ((1<<L)-1);
+
+    #define MAKEIF(O,T) template<class U=V> typename enable_if<O is_empty<U>::value, T>::type
+
+    MAKEIF(!, V&)
+    operator[](const K &x) {
+        find_val(x)
+        if (!used(h)) {
+            table[h]=x, sused(h), __size++;
         }
         return value[h];
     }
 
     bool count(const K&x) const {
-        __HASH(x)
-        while (used[h] && table[h]!=x) {
-            h = (h+1)&mod_mask;
-        }
-        return used[h];
+        find_val(x)
+        return used(h);
     }
 
-    template<class U=V>
-    typename enable_if<!is_empty<U>::value, bool>::type
+    MAKEIF(!, bool)
     insert(const pair<K, V> &p) {
-        __HASH(p.K)
-        while (used[h] && table[h]!=p.K) {
-            h = (h+1)&mod_mask;
-        }
-        if (!used[h]) {
-            table[h]=p.K, used[h]=1, value[h]=p.V, __size++;
+        find_val(p.K)
+        if (!used(h)) {
+            table[h]=p.K, sused(h), value[h]=p.V, __size++;
             return true;
         }
         return false;
     }
 
-    template<class U=V>
-    typename enable_if<is_empty<U>::value, bool>::type
+    MAKEIF(,bool)
     insert(const K &k) {
-        __HASH(k)
-        while (used[h] && table[h]!=k) {
-            h = (h+1)&mod_mask;
-        }
-        if (!used[h]) {
-            table[h]=k, used[h]=1, __size++;
+        find_val(k)
+        if (!used(h)) {
+            table[h]=k, sused(h), __size++;
             return true;
         }
         return false;
     }
 
-    #undef __HASH
+    #undef find_val
+    #undef used
+    #undef sused
+    #undef MAKEIF
 
-    void clear() {used.reset(); __size=0;}
-
+    void clear() {memset(used_arr, 0, sizeof used_arr);  __size=0;}
     int size() {return __size;}
+
+    template<bool C=alloc>
+    typename enable_if<C, void>::type destruct(){delete[] used_arr; delete[] table; delete[] value;};
+    template<bool C=alloc> typename enable_if<!C, void>::type destruct(){};
+    ~amogus_map() {destruct();}
 };
 
-template<class T>
-using amogus_set = amogus_map<T, tuple<>>;
+template<class T, int L=20, bool alloc=true>
+using amogus_set = amogus_map<T, tuple<>, L, alloc>;
 
 template<class T, int __NN, T id, T(* f)(T, T)>
 struct segtree {
