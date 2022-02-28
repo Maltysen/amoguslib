@@ -1,2 +1,0 @@
-g++ --std=gnu++14 -I$(dirname $(realpath $0)) -include stdc++.h -O3 -ffast-math -Wall -Wshadow -Wno-sign-compare $1.cpp -o $1 2>&1 | more
-

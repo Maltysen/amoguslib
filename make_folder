@@ -1,1 +1,0 @@
-cp -rT $(dirname $(realpath $0))/round .
