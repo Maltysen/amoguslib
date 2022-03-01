@@ -54,9 +54,9 @@ struct amogus_map<K,V,L,false> {
 
     MAKEIF(!, bool)
     insert(const pair<K, V> &p) {
-        find_val(p.K)
+        find_val(p.first)
         if (!used(h)) {
-            table[h]=p.K, sused(h), value[h]=p.V, __size++;
+            table[h]=p.first, sused(h), value[h]=p.second, __size++;
             return true;
         }
         return false;
@@ -77,11 +77,21 @@ struct amogus_map<K,V,L,false> {
 
 template<class K, class V, int L>
 struct amogus_map<K,V,L,true> {
-    int __res = L;
-    int __size=0;
-    K* table = new K[1<<__res];
-    V* value = new V[1<<__res];
-    char *used_arr = new char[1<<(__res-3)]();
+    int __res; int __size;
+    K* table; V* value; char *used_arr;
+    
+    amogus_map() : __res(L), __size(0), table(new K[1<<L]), value(new V[1<<L]), used_arr(new char[1<<(L-3)]()) {}
+    amogus_map(const amogus_map& m) {
+        __res = m.__res; __size=m.__size;
+        table = new K[1<<__res]; copy(m.table, m.table+(1<<__res), table);
+        value = new V[1<<__res]; copy(m.value, m.value+(1<<__res), value);
+        used_arr = new char[1<<(__res-3)]; copy(m.used_arr, m.used_arr+(1<<(__res-3)), used_arr);
+    }
+    amogus_map& operator=(amogus_map o) {
+        __res=o.__res; __size=o.__size;
+        swap(table, o.table); swap(value, o.value); swap(used_arr, o.used_arr);
+        return *this;
+    }
 
     bool CHKLOADF() {
         if (__size*3 > (1<<__res)) {
@@ -118,9 +128,9 @@ struct amogus_map<K,V,L,true> {
 
     MAKEIF(!, bool)
     insert(const pair<K, V> &p) {
-        find_val(p.K)
+        find_val(p.first)
         if (!used(h)) {
-            table[h]=p.K, sused(h), value[h]=p.V, __size++;
+            table[h]=p.first, sused(h), value[h]=p.second, __size++;
             CHKLOADF();
             return true;
         }
@@ -144,9 +154,67 @@ struct amogus_map<K,V,L,true> {
     ~amogus_map(){delete[] used_arr; delete[] table; delete[] value;};
 };
 
-#undef find_val
+template<class K, class V, int L, bool alloc>
+ostream& operator<< (ostream& o, const amogus_map<K,V,L,alloc> &m) {
+	o<<'[';
+	for (auto a:m) o<<a <<", ";
+	return o<<']';
+}
+
 #undef used
 #undef sused
+#undef find_val
+
+template<class K, class V> struct  amogus_map_iter {
+    ll *used;
+    K *table;
+    V *value;
+    int sz;
+    ll block=0;
+    int i=-1;
+
+    amogus_map_iter<K, V>& operator++() {
+        block = block & (block-1);
+        while (block==0 && i<sz-1) {
+            ++i;
+            block = used[i];
+        }
+        return *this;
+    };
+    amogus_map_iter<K,V> operator++(int) {
+        amogus_map_iter<K,V> old=*this;
+        operator++();
+        return old;
+    }
+
+    using ITT = pair<const K, V&>;
+    MAKEIF(!, ITT) operator*() {
+        int j=__builtin_ffsll(block)-1;
+        return {table[i*64+j], value[i*64+j]};
+    }
+    MAKEIF(, K) operator*() {
+        int j=__builtin_ffsll(block)-1;
+        return table[i*64+j];
+    }
+    bool operator==(amogus_map_iter<K,V> o) {
+        return o.i==i && o.block==block;
+    }
+    bool operator!=(amogus_map_iter<K,V> o) {
+        return o.i!=i || o.block!=block;
+    }
+};
+
+template<class K, class V, int L, bool alloc>
+amogus_map_iter<K,V> begin(const amogus_map<K,V,L,alloc> &m) {
+    amogus_map_iter<K,V> r{(ll*)m.used_arr, m.table, m.value, (1<<m.__res)/64};
+    return ++r;
+}
+
+template<class K, class V, int L, bool alloc>
+amogus_map_iter<K,V> end(const amogus_map<K,V,L,alloc> &m) {
+    return {nullptr, nullptr, nullptr, (1<<m.__res)/64, 0, (1<<m.__res)/64-1};
+}
+
 #undef MAKEIF
 
 template<class T, int L=8, bool alloc=true>
