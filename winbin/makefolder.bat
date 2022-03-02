@@ -1,3 +1,4 @@
+@echo off
 copy %~dp0\..\round\* .
 del build
 del xopy

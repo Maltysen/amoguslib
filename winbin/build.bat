@@ -1,3 +1,4 @@
+@echo off
 g++ --std=gnu++14 -I%~dp0\.. -g -O3 -Wall -Wshadow -Wno-sign-compare %1.cpp -o %1 2>&1 | more
 
 if not exist "out" mkdir "out"
