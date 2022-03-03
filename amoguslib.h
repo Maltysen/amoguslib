@@ -270,7 +270,18 @@ ll CRT(const vector<ll> &a, const vector<ll> &n) {
 template <class T>
 using min_heap = priority_queue<T, vector<T>, greater<T>>;
 
-typedef __int128 bb;
+#ifdef COPIER
+    #define EMPTY
+    #undef __SIZEOF_INT128__
+    EMPTY#ifdef __SIZEOF_INT128__
+        typedef __int128 bb;
+    EMPTY#else
+        typedef ll bb;
+    EMPTY#endif
+    #undef EMPTY
+#else
+    typedef __int128 bb;
+#endif
 
 /////////////////// MACROS AND I/O ///////////////////////
 
