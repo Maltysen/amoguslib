@@ -32,7 +32,7 @@ struct inverse_segtree {
     }
 };
 
-template<class T, class U, int __NN, T(*f)(T, T), U(*g)(U, U), T(*h)(U, T)>
+template<class T, class U, int __NN, T(*f)(T, T), U(*g)(U, U), T(*h)(U, T), int L=26>
 struct lazy_segtree {
 	T t[2 * NN];
 	U d[NN];
@@ -61,7 +61,7 @@ struct lazy_segtree {
     }
 
     void push(int l, int r) {
-        int s=26;
+        int s=L;
         for (l+=n, r+=n-1; s>0; --s) {
             for (int i=l>>s; i<=r>>s; ++i) if (d[i]!=idU) {
                 apply(i*2, d[i]);
