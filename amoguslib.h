@@ -1,5 +1,8 @@
 #pragma once
 
+#pragma GCC target("avx,avx2,fma")
+#pragma GCC optimize("unroll-loops")
+
 #ifndef COPIER
     #include "bits/stdc++.h"
 #elif __CYGWIN__ || _WIN32 || _WIN64
@@ -228,19 +231,44 @@ struct segtree {
 
     segtree(){} segtree(T idv) {id=idv;}
 
-    void build() {for (int i=n-1; i>0; --i) t[i] = f(t[i*2], t[i*2+1]);}
+    void build() {for (int i=n-1; i>0; --i) t[i] = f(t[i<<1], t[i<<1|1]);}
 
     void modify(int p, T value) {  // set value at position p
-      for (p+=n, t[p] = value; p /= 2;) t[p] = f(t[2*p], t[2*p+1]);
+      for (p+=n, t[p] = value; p>>=1;) t[p] = f(t[p<<1], t[p<<1|1]);
     }
 
     T query(int l, int r) { // fold f on interval [l, r)
       T resl=id, resr=id;
-      for (l += n, r += n; l < r; l /= 2, r /= 2) {
+      for (l += n, r += n; l < r; l>>=1, r>>=1) {
         if (l&1) resl = f(resl, t[l++]);
         if (r&1) resr = f(t[--r], resr);
       }
       return f(resl, resr);
+    }
+
+    // returns first idx i in [l, r) for which query(l, i+1)>=x
+    int lower_bound(int l, int r, T x, bool (*less)(T, T)) {
+        vl segs, segsr;
+        int r0=r;
+        for (l+=n, r+=n; l<r; l>>=1, r>>=1) {
+            if (l&1) segs.push_back(l++);
+            if (r&1) segsr.push_back(--r);
+        }
+        segs.insert(segs.end(), segsr.rbegin(), segsr.rend());
+
+        T cur = id;
+        for (int i=0; i<segs.size(); ++i) {
+            T neow = f(cur, t[segs[i]]);
+            if (!less(neow, x)) {
+                for (i=segs[i]; i<n; ) {
+                    neow = f(cur, t[i<<=1]);
+                    if (less(neow, x)) i++, cur=neow;
+                }
+                return i-n;
+            }
+            cur = neow;
+        }
+        return r0;
     }
 };
 
