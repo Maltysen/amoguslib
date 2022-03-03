@@ -220,19 +220,22 @@ amogus_map_iter<K,V> end(const amogus_map<K,V,L,alloc> &m) {
 template<class T, int L=8, bool alloc=true>
 using amogus_set = amogus_map<T, tuple<>, L, alloc>;
 
-#define IDT(T, idv...) static constexpr T id() {return idv;}
-
 template<class T, int __NN, T(* f)(T, T)>
 struct segtree {
     T t[2 * __NN];
-    ll n=__NN;  // array size
+    int n=__NN;  // array size
+    T id;
 
-    void modify(ll p, T value) {  // set value at position p
+    segtree(){} segtree(T idv) {id=idv;}
+
+    void build() {for (int i=n-1; i>0; --i) t[i] = f(t[i*2], t[i*2+1]);}
+
+    void modify(int p, T value) {  // set value at position p
       for (p+=n, t[p] = value; p /= 2;) t[p] = f(t[2*p], t[2*p+1]);
     }
 
-    T query(ll l, ll r) { // fold f on interval [l, r)
-      T resl=T::id(), resr=T::id();
+    T query(int l, int r) { // fold f on interval [l, r)
+      T resl=id, resr=id;
       for (l += n, r += n; l < r; l /= 2, r /= 2) {
         if (l&1) resl = f(resl, t[l++]);
         if (r&1) resr = f(t[--r], resr);
@@ -266,6 +269,8 @@ ll CRT(const vector<ll> &a, const vector<ll> &n) {
 
 template <class T>
 using min_heap = priority_queue<T, vector<T>, greater<T>>;
+
+typedef __int128 bb;
 
 /////////////////// MACROS AND I/O ///////////////////////
 
@@ -318,4 +323,5 @@ void _print(T t, V... v) {cerr<<t; if (sizeof...(v)) cerr << ", "; _print(v...);
 #define EXT(x) {cout<<x<<'\n'; goto _restart;}
 #define EX(x) {cout<<x<<'\n'; exit(0);}
 #define SP(x) setprecision(x)
+#define FSP(x) fixed<<setprecision(x)
 
