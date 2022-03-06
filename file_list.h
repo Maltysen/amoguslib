@@ -9,3 +9,6 @@ int modular(){}
 int prime(){}
 int constants(){}
 int pbds(){}
+int linalg(){}
+int linalgmod(){}
+int linalgf2(){}
