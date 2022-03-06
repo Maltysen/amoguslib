@@ -4,7 +4,7 @@
 
 ll choose(ll n, ll k) {
     if (k>n) return 0;
-    return f[n] *f[n-k]%M * f[k]%M;
+    return f[n] *fi[n-k]%M * fi[k]%M;
 }
 
 ll choose_with_repl(ll n, ll k) {
