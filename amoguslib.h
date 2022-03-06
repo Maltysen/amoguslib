@@ -1,7 +1,7 @@
 #pragma once
 
-#pragma GCC target("avx,avx2,fma")
-#pragma GCC optimize("unroll-loops")
+#pragma GCC target("avx2,popcnt,lzcnt,abm,bmi,bmi2,tune=native")
+#pragma GCC optimize("O3,unroll-loops")
 
 #ifndef COPIER
     #include "bits/stdc++.h"
