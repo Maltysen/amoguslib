@@ -1,6 +1,6 @@
 #pragma once
 
-#pragma GCC target("avx2,popcnt,lzcnt,abm,bmi,bmi2,tune=native")
+#pragma GCC target("avx2,popcnt,lzcnt,abm,bmi,bmi2")
 #pragma GCC optimize("O3,unroll-loops")
 
 #ifndef COPIER
@@ -234,7 +234,10 @@ struct segtree {
     void build() {for (int i=n-1; i>0; --i) t[i] = f(t[i<<1], t[i<<1|1]);}
 
     void modify(int p, T value) {  // set value at position p
-      for (p+=n, t[p] = value; p>>=1;) t[p] = f(t[p<<1], t[p<<1|1]);
+        for (p+=n, t[p] = value; p>>=1;) t[p] = f(t[p<<1], t[p<<1|1]);
+    }
+    void incr(int p, T value) {
+        for (p+=n, t[p] = f(t[p], value); p>>=1;) t[p] = f(t[p<<1], t[p<<1|1]);
     }
 
     T query(int l, int r) { // fold f on interval [l, r)
