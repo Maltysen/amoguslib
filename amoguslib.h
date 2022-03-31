@@ -311,7 +311,11 @@ using min_heap = priority_queue<T, vector<T>, greater<T>>;
     EMPTY#endif
     #undef EMPTY
 #else
-    typedef __int128 bb;
+    #ifdef __SIZEOF_INT128__
+        typedef __int128 bb;
+    #else
+        typedef ll bb;
+    #endif
 #endif
 
 /////////////////// MACROS AND I/O ///////////////////////
